@@ -1,0 +1,22 @@
+KEY CONCEPTS IN ML
+
+>>>Supervised Learning : Learn to predict target value from labelled data
+"And here our goal is to predict some output variable that's associated with each input item"
+1. Classification : target values are discrete classes (Consider bank transaction being fraudulent or not) learn function "Classifier"
+2. Regression : target values are continuos values (Consider when output variable is not a category but real valued number like the amount of time needed for a car to go from 0 - 100kmph ) learn function "regression"
+
+>>>Unsupervised Learning : Find structure in unlabelled data
+1. Finding groups of similar instances in the data (Clustering)
+2. Finding unusual pattern (outlier detection)
+
+a. Decide type of learning algorithm to apply to data
+eg. There are many different ways to represent an image, typically as an array of colored pixels, even meta data associated with the image (Need to have some way, some representation of the data you have and the choice of which algo for data)
+b. Decide on evaluation method
+Provides some type of quality or accuracy score, for the predictions or the output that is coming out of the machine learning algorithm typically I say classifier
+c. Once we've decided on how to represent the input data, the type of classifier and the evaluation method. We need to then search for the optimal classifier that gives the best evaluation outcome for that problem.
+
+Convert the problem into a representation that the computer can deal with
+1. Convert each input object ( sample ) into a set of features that describe the objects
+2. Pick a learning model, typically the type of classifier that you want the system to learn
+
+Feature representation for an object : Each data point in your dataset represents something, some object or situation or event. Some entity that's being represented by a list of properties. (Attribute values for an object are called features)

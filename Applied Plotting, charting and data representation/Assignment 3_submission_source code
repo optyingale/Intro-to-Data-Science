@@ -1,0 +1,117 @@
+# Use the following data for this assignment:
+
+import pandas as pd
+import numpy as np
+
+np.random.seed(12345)
+
+df = pd.DataFrame([np.random.normal(32000,200000,3650), 
+                   np.random.normal(43000,100000,3650), 
+                   np.random.normal(43500,140000,3650), 
+                   np.random.normal(48000,70000,3650)], 
+                  index=[1992,1993,1994,1995])
+				  
+dfT =df.T
+dfStats = dfT.describe()
+dfStats
+dfStatsT = dfStats.T
+dfStatsT['yerr'] = 1.96 * dfStatsT['std'] / np.sqrt(dfStatsT['count'])
+dfStats = dfStatsT.T
+dfStats
+
+import matplotlib.pyplot as plt
+import pandas as pd
+import numpy as np
+import matplotlib.dates as mdates
+%matplotlib notebook
+
+dfT.head()
+df.head()
+
+plt.figure()
+_=plt.boxplot([dfT[1992], dfT[1993],dfT[1994],dfT[1995]], whis='range')
+
+plt.figure()
+_=plt.hist(dfT[1992], bins=100)
+
+from matplotlib.artist import Artist
+
+def rec_gc(art, depth=0):
+    if isinstance(art, Artist):
+        # increase the depth for pretty printing
+        print("  " * depth + str(art))
+        for child in art.get_children():
+            rec_gc(child, depth+2)
+			
+import mpl_toolkits.axes_grid1.inset_locator as mpl_il
+
+meanSeries = dfStats.loc['mean']
+xMeanList = list(dfStats)
+yMeanList = list(meanSeries)
+errList = list(dfStats.loc['yerr'])
+
+print(xMeanList)
+print(yMeanList)
+
+pos = np.arange(len(xMeanList))/2
+fig= plt.figure()
+
+container = plt.bar(pos, yMeanList, align='center', yerr= errList, edgecolor='black', color=['blue', 'white', 'white', 'red'], width = .5, linewidth =1)
+_=plt.xticks(pos, xMeanList)
+x1, x2 = plt.xlim()
+plt.xlim(x1, x2 + .8)
+bars = container.get_children()
+for b in bars:
+    b.set_color((0.1, 0.2, 0.4, 0.3)) #rgba
+
+
+y=30000
+x1, x2 = plt.xlim()
+line, = plt.plot([x1, x2], [y, y], 'k-', color=(0,0,1,.5), lw=1, label="_not in legend")
+
+def onclick(event):
+    #plt.cla()
+    #plt.plot(data)
+    plt.gca().set_title('Distribution comparison for chosen mean of: {}'.format( event.ydata))
+    line.set_ydata([event.ydata,event.ydata])
+    yPick = event.ydata
+    for b, yMean, yErr in zip(bars, yMeanList, errList):
+        redVal =0
+        blueVal =0
+        alpha =1
+        if yPick > yMean :
+            blueVal = 1 #min(1, (yPick-yMean-yErr)/yErr)
+            alpha = min(1, (yPick-yMean)/yErr)
+        if yPick < yMean :
+            redVal = 1 #min(1, (yMean-yPick-yErr)/yErr) 
+            alpha = min(1, (yMean-yPick)/yErr) 
+        b.set_color((redVal, 0, blueVal, alpha)) #rgba
+        b.set_edgecolor('black')
+
+# tell mpl_connect we want to pass a 'button_press_event' into onclick when the event is detected
+plt.gcf().canvas.mpl_connect('button_press_event', onclick)
+
+from matplotlib import pyplot as plt
+
+class LineBuilder:
+    def __init__(self, line):
+        self.line = line
+        self.xs = list(line.get_xdata())
+        self.ys = list(line.get_ydata())
+        self.cid = line.figure.canvas.mpl_connect('button_press_event', self)
+
+    def __call__(self, event):
+        print('click', event)
+        if event.inaxes!=self.line.axes: return
+        self.xs.append(event.xdata)
+        self.ys.append(event.ydata)
+        self.line.set_data(self.xs, self.ys)
+        self.line.figure.canvas.draw()
+
+fig = plt.figure()
+ax = fig.add_subplot(111)
+ax.set_title('click to build line segments')
+line, = ax.plot([0], [0])  # empty line
+linebuilder = LineBuilder(line)
+
+plt.show()			
